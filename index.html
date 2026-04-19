@@ -1031,16 +1031,21 @@
                 return;
             }
 
-            signInWithEmailAndPassword(auth, email, pass)
-                .then((userCred) => {
-                    emitirToast("Acesso autorizado. Redirecionando...", "success");
-                    setTimeout(() => toggleModal('modalLogin'), 1500);
-                     window.location.href = 'https://dashboard.com'; 
-                 // Descomente para redirecionar
-                })
-                .catch((error) => {
-                    emitirToast("Credenciais inválidas.", "error");
-                });
+            // Exemplo simplificado de login no index.html
+signInWithEmailAndPassword(auth, email, senha)
+  .then((userCredential) => {
+    // Login bem-sucedido!
+    emitirToast("Sucesso", "Bem-vindo ao sistema!", "success");
+    
+    // Aguarda um segundinho para o usuário ver o toast e redireciona
+    setTimeout(() => {
+        window.location.href = 'dashboard.html'; // Coloque o nome exato do seu arquivo de admin
+    }, 1000);
+  })
+  .catch((error) => {
+    emitirToast("Erro", "E-mail ou senha incorretos.", "error");
+  });
+            
         }
     </script>
 </body>
