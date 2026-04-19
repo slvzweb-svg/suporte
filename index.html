@@ -1035,7 +1035,7 @@
                 .then((userCred) => {
                     emitirToast("Acesso autorizado. Redirecionando...", "success");
                     setTimeout(() => toggleModal('modalLogin'), 1500);
-                     window.location.href = '/dashboard'; // Descomente para redirecionar
+                     window.location.href = '/dashboard.html'; // Descomente para redirecionar
                 })
                 .catch((error) => {
                     emitirToast("Credenciais inválidas.", "error");
