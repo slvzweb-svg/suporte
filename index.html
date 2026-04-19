@@ -960,93 +960,177 @@
                 return;
             }
 
-            const horariosSelecionados = Array.from(checks).map(c => c.value);
+            c<script type="module">
+    // Importando módulos Firebase v10
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-            // Loading state
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+    // Configuração Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAwVQFewEN1mQDe0pnIEVU_H98l5JCeciI",
+        authDomain: "site-f55e1.firebaseapp.com",
+        projectId: "site-f55e1",
+        storageBucket: "site-f55e1.firebasestorage.app",
+        messagingSenderId: "800441189890",
+        appId: "1:800441189890:web:27f8911aa47964665f091b"
+    };
 
-            // Montar Payload
-            const dadosRecrutamento = {
-                status: "Aguardando Análise",
-                data_inscricao: serverTimestamp(),
-                basico: {
-                    nome: document.getElementById('nome').value,
-                    idade: document.getElementById('idade').value,
-                    cidade: document.getElementById('cidade').value,
-                    discord: document.getElementById('discord').value
-                },
-                perfil: {
-                    paciente: document.getElementById('p1').value,
-                    reacao: document.getElementById('p2').value,
-                    metodo_resolucao: document.getElementById('p3').value
-                },
-                pratica: {
-                    player_nervoso: document.getElementById('p4').value,
-                    sem_solucao: document.getElementById('p5').value,
-                    discussao_ticket: document.getElementById('p6').value
-                },
-                disponibilidade: {
-                    horarios: horariosSelecionados,
-                    horas_diarias: document.getElementById('p8').value,
-                    constancia: document.getElementById('p9').value
-                },
-                tecnico: {
-                    dispositivos: document.getElementById('p10').value,
-                    estabilidade: document.getElementById('p11').value,
-                    regras_rp: document.getElementById('p12').value,
-                    experiencia_previa: document.getElementById('p13').value,
-                    nivel_discord: document.getElementById('p14').value
-                },
-                psicologico: {
-                    motivacao: document.getElementById('p15').value,
-                    qualidades_necessarias: document.getElementById('p16').value,
-                    aceita_hierarquia: document.getElementById('p17').value,
-                    lida_criticas: document.getElementById('p18').value
-                }
-            };
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-            try {
-                // Inserir no Firestore
-                await addDoc(collection(db, "candidatos_suporte"), dadosRecrutamento);
-                emitirToast("Inscrição enviada com sucesso!", "success");
-                this.reset();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (error) {
-                console.error("Erro banco de dados:", error);
-                emitirToast("Falha na conexão com o servidor.", "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span>Enviar Inscrição</span> <i class="fa-solid fa-arrow-right"></i>';
+    // Função de Toasts (Notificações)
+    window.emitirToast = function(mensagem, tipo = 'success') {
+        const caixa = document.getElementById('toastBox');
+        if (!caixa) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${tipo}`;
+        
+        const icone = tipo === 'success' 
+            ? '<i class="fa-solid fa-check"></i>' 
+            : '<i class="fa-solid fa-triangle-exclamation"></i>';
+            
+        toast.innerHTML = `${icone} <span>${mensagem}</span>`;
+        caixa.appendChild(toast);
+
+        // Animação de entrada
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Remoção automática
+        setTimeout(() => { 
+            toast.classList.remove('show'); 
+            setTimeout(() => toast.remove(), 400); 
+        }, 4000);
+    }
+
+    // Controle de Modais
+    window.toggleModal = function(id) {
+        const modal = document.getElementById(id);
+        if(!modal) return;
+        
+        if(modal.classList.contains('active')) {
+            modal.classList.remove('active');
+        } else {
+            modal.classList.add('active');
+        }
+    }
+
+    // Fechar modal ao clicar fora
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if(e.target === this) {
+                this.classList.remove('active');
             }
         });
+    });
 
-        // Função de Login
-        window.executarLogin = function() {
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-
-            if(!email || !pass) {
-                emitirToast("Preencha todos os campos.", "error");
-                return;
-            }
-
-            // Exemplo simplificado de login no index.html
-signInWithEmailAndPassword(auth, email, senha)
-  .then((userCredential) => {
-    // Login bem-sucedido!
-    emitirToast("Sucesso", "Bem-vindo ao sistema!", "success");
-    
-    // Aguarda um segundinho para o usuário ver o toast e redireciona
-    setTimeout(() => {
-        window.location.href = 'dashboard.html'; // Coloque o nome exato do seu arquivo de admin
-    }, 1000);
-  })
-  .catch((error) => {
-    emitirToast("Erro", "E-mail ou senha incorretos.", "error");
-  });
-            
+    // Envio do Formulário Principal (Recrutamento)
+    document.getElementById('formRecrutamento').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnSubmitForm');
+        
+        // Validar Horários
+        const checks = document.querySelectorAll('input[name="horario"]:checked');
+        if(checks.length === 0) {
+            emitirToast("Selecione pelo menos um horário disponível.", "error");
+            return;
         }
-    </script>
+
+        const horariosSelecionados = Array.from(checks).map(c => c.value);
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+
+        // Montar Payload
+        const dadosRecrutamento = {
+            status: "Aguardando Análise",
+            data_inscricao: serverTimestamp(),
+            basico: {
+                nome: document.getElementById('nome').value,
+                idade: document.getElementById('idade').value,
+                cidade: document.getElementById('cidade').value,
+                discord: document.getElementById('discord').value
+            },
+            perfil: {
+                paciente: document.getElementById('p1').value,
+                reacao: document.getElementById('p2').value,
+                metodo_resolucao: document.getElementById('p3').value
+            },
+            pratica: {
+                player_nervoso: document.getElementById('p4').value,
+                sem_solucao: document.getElementById('p5').value,
+                discussao_ticket: document.getElementById('p6').value
+            },
+            disponibilidade: {
+                horarios: horariosSelecionados,
+                horas_diarias: document.getElementById('p8').value,
+                constancia: document.getElementById('p9').value
+            },
+            tecnico: {
+                dispositivos: document.getElementById('p10').value,
+                estabilidade: document.getElementById('p11').value,
+                regras_rp: document.getElementById('p12').value,
+                experiencia_previa: document.getElementById('p13').value,
+                nivel_discord: document.getElementById('p14').value
+            },
+            psicologico: {
+                motivacao: document.getElementById('p15').value,
+                qualidades_necessarias: document.getElementById('p16').value,
+                aceita_hierarquia: document.getElementById('p17').value,
+                lida_criticas: document.getElementById('p18').value
+            }
+        };
+
+        try {
+            // Inserir no Firestore
+            await addDoc(collection(db, "candidatos_suporte"), dadosRecrutamento);
+            emitirToast("Inscrição enviada com sucesso!", "success");
+            this.reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            console.error("Erro banco de dados:", error);
+            emitirToast("Falha na conexão com o servidor.", "error");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>Enviar Inscrição</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+    });
+
+    // Função de Login Admin
+    window.executarLogin = function() {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+
+        if(!email || !pass) {
+            emitirToast("Preencha todos os campos.", "error");
+            return;
+        }
+
+        // Tentar autenticação com Firebase
+        signInWithEmailAndPassword(auth, email, pass)
+            .then((userCred) => {
+                emitirToast("Acesso autorizado. Redirecionando...", "success");
+                
+                // Aguarda um pequeno delay para o usuário ver o feedback e redireciona
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html'; 
+                }, 1200);
+            })
+            .catch((error) => {
+                console.error("Erro login:", error.code);
+                if(error.code === 'auth/invalid-credential') {
+                    emitirToast("E-mail ou senha incorretos.", "error");
+                } else {
+                    emitirToast("Erro ao tentar conectar.", "error");
+                }
+            });
+    }
+</script>
+
 </body>
 </html>
