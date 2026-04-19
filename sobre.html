@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte Nobre RP | Recrutamento</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === PALETA DE CORES (Baseada nas Imagens) === */
+        :root {
+            /* Tons Monocromáticos (Inspirado na imagem 2) */
+            --bg-base: #050505;
+            --bg-surface: #121212;
+            --bg-surface-hover: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #9e9e9e;
+            --text-muted: #666666;
+            
+            /* Cores de Destaque (Inspirado na imagem 1 - Jester) */
+            --accent-red: #d32f2f;
+            --accent-red-hover: #b71c1c;
+            --accent-gold: #c5a059;
+            
+            /* Inputs */
+            --input-bg: #0a0a0a;
+            --input-border: #333333;
+            --input-focus: var(--accent-red);
+
+            /* Sombras e Efeitos */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.8);
+            --shadow-red: 0 4px 20px rgba(211, 47, 47, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* === RESET E BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(211, 47, 47, 0.03), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(197, 160, 89, 0.02), transparent 25%);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* === HEADER === */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .brand i {
+            color: var(--accent-red);
+            font-size: 1.5rem;
+        }
+
+        .btn-header-login {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-header-login:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            background: var(--bg-surface);
+        }
+
+        /* === CONTAINER PRINCIPAL === */
+        .wrapper {
+            max-width: 800px;
+            margin: 100px auto 60px;
+            padding: 0 20px;
+        }
+
+        /* === HEADER DO FORMULÁRIO === */
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeDown 0.6s ease-out;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* === CARDS DE SEÇÃO === */
+        .section-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            animation: fadeUp 0.6s ease-out backwards;
+        }
+
+        .section-card:hover {
+            border-color: #3a3a3a;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title i {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+        }
+
+        .section-title h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* === INPUTS E CONTROLES === */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        label span.required {
+            color: var(--accent-red);
+            margin-left: 4px;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        input[type="email"], 
+        input[type="password"], 
+        select, 
+        textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            padding: 14px 16px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--input-focus);
+            background-color: #000;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Select customizado simples */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239e9e9e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px top 50%;
+            background-size: 10px auto;
+        }
+
+        /* Checkboxes customizados (Grid de Horários) */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .checkbox-card {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .checkbox-card h4 {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .check-item:last-child { margin-bottom: 0; }
+
+        .check-item input[type="checkbox"] {
+            appearance: none;
+            background-color: var(--bg-surface);
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 1px solid var(--text-muted);
+            border-radius: 3px;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .check-item input[type="checkbox"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--bg-base);
+            background-color: var(--text-primary);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .check-item input[type="checkbox"]:checked {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .check-item input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+
+        .check-item span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .check-item:hover span { color: var(--text-primary); }
+
+        /* === BOTÃO DE SUBMIT === */
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-red);
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--accent-red-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(211, 47, 47, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .post-submit-info {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 16px;
+        }
+
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 60px;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+        }
+
+        .btn-privacy {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-privacy:hover {
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        /* === MODALS === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.98) translateY(10px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 i { color: var(--accent-red); }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-close:hover { color: var(--accent-red); }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .modal-body h4 {
+            color: var(--text-primary);
+            margin: 20px 0 10px;
+            font-size: 1rem;
+        }
+
+        .modal-body p { margin-bottom: 10px; }
+        .modal-body ul, .modal-body ol { padding-left: 20px; margin-bottom: 15px; }
+        .modal-body li { margin-bottom: 6px; }
+
+        .alert-box {
+            background: rgba(211, 47, 47, 0.1);
+            border-left: 3px solid var(--accent-red);
+            padding: 16px;
+            margin-top: 24px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .alert-box h4 { margin-top: 0; color: var(--accent-red); }
+
+        /* Modal Login Admin Específico */
+        .modal-login .modal-content { max-width: 400px; }
+        .btn-login-action {
+            width: 100%;
+            background: var(--text-primary);
+            color: var(--bg-base);
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-login-action:hover { background: var(--text-secondary); }
+
+        /* === TOASTS NOTIFICATIONS === */
+        .toast-wrapper {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 6px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0; width: 4px;
+        }
+
+        .toast.success::before { background: #4caf50; }
+        .toast.error::before { background: var(--accent-red); }
+        .toast.show { transform: translateX(0); }
+
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: #4caf50; }
+        .toast.error i { color: var(--accent-red); }
+
+        /* === ANIMAÇÕES === */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .wrapper { margin-top: 80px; }
+            .section-card { padding: 20px; }
+            .checkbox-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <i class="fa-solid fa-chess-knight"></i>
+            <span>Nobre RP</span>
+        </div>
+        <button class="btn-header-login" onclick="toggleModal('modalLogin')">
+            <i class="fa-solid fa-lock"></i> Staff
+        </button>
+    </header>
+
+    <div class="wrapper">
+        
+        <div class="form-header">
+            <h1>Formulário de Suporte</h1>
+            <p>Buscamos pessoas pacientes, responsáveis e com boa comunicação para integrar nossa equipe. Responda com sinceridade.</p>
+        </div>
+
+        <form id="formRecrutamento">
+            
+            <div class="section-card" style="animation-delay: 0.1s;">
+                <div class="section-title">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <h2>Dados Básicos</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nome">Nome completo <span class="required">*</span></label>
+                    <input type="text" id="nome" required placeholder="Digite seu nome real">
+                </div>
+                
+                <div class="form-group">
+                    <label for="idade">Idade <span class="required">*</span></label>
+                    <input type="number" id="idade" required placeholder="Sua idade atual" min="14" max="99">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cidade">Cidade/Estado <span class="required">*</span></label>
+                    <input type="text" id="cidade" required placeholder="Ex: São Paulo / SP">
+                </div>
+                
+                <div class="form-group">
+                    <label for="discord">@ do Discord <span class="required">*</span></label>
+                    <input type="text" id="discord" required placeholder="Ex: seunickname">
+                </div>
+            </div>
+
+            <div class="section-card" style="animation-delay: 0.2s;">
+                <div class="section-title">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <h2>Perfil de Suporte (Essencial)</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="p1">1. Você se considera uma pessoa paciente? Por quê? <span class="required">*</span></label>
+                    <textarea id="p1" required placeholder="Desenvolva sua resposta..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p2">2. Como você reage quando alguém te xinga ou fala de forma agressiva? <span class="required">*</span></label>
+                    <textarea id="p2" required placeholder="Seja honesto sobre suas reações..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p3">3. Você prefere resolver problemas sozinho ou pedir ajuda? Explique. <span class="required">*</span></label>
+                    <textarea id="p3" required placeholder="Como é sua dinâmica de trabalho?"></textarea>
+                </div>
+            </div>
+
+            <div class="section-card" style="animation-delay: 0.3s;">
+                <div class="section-title">
+                    <i class="fa-solid fa-bolt"></i>
+                    <h2>Situações Práticas</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="p4">4. Um player abre ticket nervoso, reclamando da staff. O que você faz? <span class="required">*</span></label>
+                    <textarea id="p4" required placeholder="Descreva passo a passo sua ação..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p5">5. Você não sabe resolver o problema do player. Como age? <span class="required">*</span></label>
+                    <textarea id="p5" required placeholder="Qual sua atitude?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p6">6. Dois players começam a discutir dentro do ticket. O que você faz? <span class="required">*</span></label>
+                    <textarea id="p6" required placeholder="Como você controla a situação?"></textarea>
+                </div>
+            </div>
+
+            <div class="section-card" style="animation-delay: 0.4s;">
+                <div class="section-title">
+                    <i class="fa-regular fa-clock"></i>
+                    <h2>Compromisso</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>7. Qual seu horário disponível? (Selecione todos os aplicáveis) <span class="required">*</span></label>
+                    <div class="checkbox-grid">
+                        
+                        <div class="checkbox-card">
+                            <h4>Madrugada</h4>
+                            <label class="check-item"><input type="checkbox" name="horario" value="00:00 às 02:00"><span>00:00 às 02:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="02:00 às 04:00"><span>02:00 às 04:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="04:00 às 06:00"><span>04:00 às 06:00</span></label>
+                        </div>
+
+                        <div class="checkbox-card">
+                            <h4>Manhã</h4>
+                            <label class="check-item"><input type="checkbox" name="horario" value="06:00 às 08:00"><span>06:00 às 08:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="08:00 às 10:00"><span>08:00 às 10:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="10:00 às 12:00"><span>10:00 às 12:00</span></label>
+                        </div>
+
+                        <div class="checkbox-card">
+                            <h4>Tarde</h4>
+                            <label class="check-item"><input type="checkbox" name="horario" value="12:00 às 14:00"><span>12:00 às 14:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="14:00 às 16:00"><span>14:00 às 16:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="16:00 às 18:00"><span>16:00 às 18:00</span></label>
+                        </div>
+
+                        <div class="checkbox-card">
+                            <h4>Noite</h4>
+                            <label class="check-item"><input type="checkbox" name="horario" value="18:00 às 20:00"><span>18:00 às 20:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="20:00 às 22:00"><span>20:00 às 22:00</span></label>
+                            <label class="check-item"><input type="checkbox" name="horario" value="22:00 às 00:00"><span>22:00 às 00:00</span></label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 24px;">
+                    <label for="p8">8. Quantas horas por dia você pode dedicar ao suporte? <span class="required">*</span></label>
+                    <input type="number" id="p8" required placeholder="Ex: 4">
+                </div>
+
+                <div class="form-group">
+                    <label for="p9">9. Você consegue manter constância nos dias? <span class="required">*</span></label>
+                    <select id="p9" required>
+                        <option value="" disabled selected>Selecione uma opção</option>
+                        <option value="Sim, entro todos os dias">Sim, entro todos os dias</option>
+                        <option value="Maioria dos dias da semana">Maioria dos dias da semana</option>
+                        <option value="Apenas finais de semana">Apenas finais de semana</option>
+                        <option value="Tenho horários muito irregulares">Tenho horários muito irregulares</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-card" style="animation-delay: 0.5s;">
+                <div class="section-title">
+                    <i class="fa-solid fa-display"></i>
+                    <h2>Acesso e Conhecimento</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="p10">10. Você utiliza celular, PC ou ambos? Quantos dispositivos possui? <span class="required">*</span></label>
+                    <input type="text" id="p10" required placeholder="Ex: PC e 1 Smartphone">
+                </div>
+
+                <div class="form-group">
+                    <label for="p11">11. Seu acesso é estável (internet/tempo disponível)? <span class="required">*</span></label>
+                    <select id="p11" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="100% Estável">100% Estável</option>
+                        <option value="Razoável">Razoável</option>
+                        <option value="Instável">Instável</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="p12">12. Você conhece as regras básicas de RP? <span class="required">*</span></label>
+                    <select id="p12" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Conheço todas avançadas">Sim, conheço todas (Avançado)</option>
+                        <option value="Conheço o básico">Conheço o básico</option>
+                        <option value="Sou iniciante">Sou iniciante</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="p13">13. Já teve experiência com suporte ou atendimento? Se sim, explique. <span class="required">*</span></label>
+                    <textarea id="p13" required placeholder="Detalhe sua experiência anterior..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p14">14. Qual o nível de conhecimento do Discord? <span class="required">*</span></label>
+                    <select id="p14" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Baixa">Baixa (Apenas usuário comum)</option>
+                        <option value="Média">Média (Sei configurar canais/cargos básicos)</option>
+                        <option value="Alta">Alta (Domino permissões, bots, webhooks)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-card" style="animation-delay: 0.6s;">
+                <div class="section-title">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <h2>Intenção e Responsabilidade</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="p15">15. Por que você quer entrar para o suporte do Nobre RP? <span class="required">*</span></label>
+                    <textarea id="p15" required placeholder="Sua principal motivação..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p16">16. O que você acha que um bom suporte precisa ter? <span class="required">*</span></label>
+                    <textarea id="p16" required placeholder="Liste as qualidades..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="p17">17. Você está disposto a seguir regras e hierarquia da equipe? <span class="required">*</span></label>
+                    <select id="p17" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Sim, totalmente disposto">Sim, totalmente disposto</option>
+                        <option value="Não">Não</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="p18">18. Como você lida com críticas ou correções? <span class="required">*</span></label>
+                    <textarea id="p18" required placeholder="Como você reage ao feedback negativo?"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btnSubmitForm">
+                <span>Enviar Inscrição</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <div class="post-submit-info">
+                Após o envio, sua inscrição será analisada. Caso aprovado, entraremos em contato pelo Discord.
+            </div>
+
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Nobre RP. Todos os direitos reservados.</p>
+        <button class="btn-privacy" onclick="toggleModal('modalPrivacidade')">
+            <i class="fa-solid fa-shield-halved"></i> Política de Privacidade
+        </button>
+    </footer>
+
+    <div class="modal-overlay" id="modalPrivacidade">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-shield-check"></i> Política de Privacidade – Nobre RP</h3>
+                <button class="btn-close" onclick="toggleModal('modalPrivacidade')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>A <strong>NOBRE RP</strong> coleta alguns dados pessoais apenas para avaliar candidatos nos processos seletivos de administrador. Tudo é feito com segurança e seguindo a LGPD.</p>
+                
+                <h4>1. QUAIS DADOS SÃO SOLICITADOS?</h4>
+                <p>Durante a entrevista, podemos pedir que você envie voluntariamente um vídeo curto contendo:</p>
+                <ul>
+                    <li>Seu rosto, para identificação;</li>
+                    <li>Nome completo;</li>
+                    <li>Idade;</li>
+                    <li>Estado onde mora.</li>
+                </ul>
+
+                <h4>2. PARA QUE SERVE?</h4>
+                <p>Esses dados são usados só para analisar seu perfil e confirmar se você cumpre os requisitos para ser administrador. Não usamos para mais nada.</p>
+
+                <h4>3. ONDE FICA GUARDADO E QUEM VÊ?</h4>
+                <ul>
+                    <li>Os vídeos ficam em uma pasta segura com acesso restrito.</li>
+                    <li>Só a Gerência e os Líderes responsáveis pelo recrutamento podem acessar.</li>
+                    <li>Nenhum dado ou vídeo é postado ou repassado pra fora.</li>
+                </ul>
+
+                <h4>4. POSSO PEDIR PRA APAGAR?</h4>
+                <p>Sim. Você pode solicitar a exclusão dos seus dados a qualquer momento abrindo um ticket. Se você não for aprovado, seus dados serão apagados em até 30 dias após o fim da seletiva.</p>
+
+                <h4>5. SOU OBRIGADO A ENVIAR?</h4>
+                <p>Não. O envio é 100% voluntário e não gera nenhuma punição. Porém, sem o vídeo não conseguimos confirmar sua identidade, então você não poderá continuar no processo de administrador.</p>
+
+                <div class="alert-box">
+                    <h4>REGRAS CONTRA VAZAMENTO DE DADOS</h4>
+                    <p>A <strong>NOBRE RP</strong> leva a privacidade a sério. Qualquer Líder ou Staff que vazar, copiar, salvar em local não autorizado ou usar os dados de candidatos para outra finalidade receberá:</p>
+                    <ol>
+                        <li>Remoção imediata do cargo;</li>
+                        <li>Banimento permanente da NOBRE RP;</li>
+                        <li>Denúncia para o Owner Geral;</li>
+                        <li>Medidas legais cabíveis, se necessário.</li>
+                    </ol>
+                    <p style="margin-top:10px; font-weight:600;">Não toleramos qualquer desrespeito à privacidade dos membros.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay modal-login" id="modalLogin">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-terminal"></i> Acesso Restrito</h3>
+                <button class="btn-close" onclick="toggleModal('modalLogin')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>E-mail Corporativo</label>
+                    <input type="email" id="loginEmail" placeholder="admin@nobrerp.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha de Acesso</label>
+                    <input type="password" id="loginPass" placeholder="••••••••">
+                </div>
+                <button class="btn-login-action" onclick="executarLogin()">Conectar ao Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-wrapper" id="toastBox"></div>
+
+    <script type="module">
+        // Importando módulos Firebase v10
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Configuração Firebase (Mesma do escopo anterior)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwVQFewEN1mQDe0pnIEVU_H98l5JCeciI",
+            authDomain: "site-f55e1.firebaseapp.com",
+            projectId: "site-f55e1",
+            storageBucket: "site-f55e1.firebasestorage.app",
+            messagingSenderId: "800441189890",
+            appId: "1:800441189890:web:27f8911aa47964665f091b"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Função de Toasts (Notificações)
+        window.emitirToast = function(mensagem, tipo = 'success') {
+            const caixa = document.getElementById('toastBox');
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            
+            const icone = tipo === 'success' 
+                ? '<i class="fa-solid fa-check"></i>' 
+                : '<i class="fa-solid fa-triangle-exclamation"></i>';
+                
+            toast.innerHTML = `${icone} <span>${mensagem}</span>`;
+            caixa.appendChild(toast);
+
+            // Animação de entrada
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remoção automática
+            setTimeout(() => { 
+                toast.classList.remove('show'); 
+                setTimeout(() => toast.remove(), 400); 
+            }, 4000);
+        }
+
+        // Controle de Modais
+        window.toggleModal = function(id) {
+            const modal = document.getElementById(id);
+            if(modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            } else {
+                modal.classList.add('active');
+            }
+        }
+
+        // Fechar modal ao clicar fora
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if(e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Envio do Formulário Principal
+        document.getElementById('formRecrutamento').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnSubmitForm');
+            
+            // Validar Horários
+            const checks = document.querySelectorAll('input[name="horario"]:checked');
+            if(checks.length === 0) {
+                emitirToast("Selecione pelo menos um horário disponível.", "error");
+                return;
+            }
+
+            const horariosSelecionados = Array.from(checks).map(c => c.value);
+
+            // Loading state
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+
+            // Montar Payload
+            const dadosRecrutamento = {
+                status: "Aguardando Análise",
+                data_inscricao: serverTimestamp(),
+                basico: {
+                    nome: document.getElementById('nome').value,
+                    idade: document.getElementById('idade').value,
+                    cidade: document.getElementById('cidade').value,
+                    discord: document.getElementById('discord').value
+                },
+                perfil: {
+                    paciente: document.getElementById('p1').value,
+                    reacao: document.getElementById('p2').value,
+                    metodo_resolucao: document.getElementById('p3').value
+                },
+                pratica: {
+                    player_nervoso: document.getElementById('p4').value,
+                    sem_solucao: document.getElementById('p5').value,
+                    discussao_ticket: document.getElementById('p6').value
+                },
+                disponibilidade: {
+                    horarios: horariosSelecionados,
+                    horas_diarias: document.getElementById('p8').value,
+                    constancia: document.getElementById('p9').value
+                },
+                tecnico: {
+                    dispositivos: document.getElementById('p10').value,
+                    estabilidade: document.getElementById('p11').value,
+                    regras_rp: document.getElementById('p12').value,
+                    experiencia_previa: document.getElementById('p13').value,
+                    nivel_discord: document.getElementById('p14').value
+                },
+                psicologico: {
+                    motivacao: document.getElementById('p15').value,
+                    qualidades_necessarias: document.getElementById('p16').value,
+                    aceita_hierarquia: document.getElementById('p17').value,
+                    lida_criticas: document.getElementById('p18').value
+                }
+            };
+
+            try {
+                // Inserir no Firestore
+                await addDoc(collection(db, "candidatos_suporte"), dadosRecrutamento);
+                emitirToast("Inscrição enviada com sucesso!", "success");
+                this.reset();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                console.error("Erro banco de dados:", error);
+                emitirToast("Falha na conexão com o servidor.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Enviar Inscrição</span> <i class="fa-solid fa-arrow-right"></i>';
+            }
+        });
+
+        // Função de Login
+        window.executarLogin = function() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+
+            if(!email || !pass) {
+                emitirToast("Preencha todos os campos.", "error");
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, pass)
+                .then((userCred) => {
+                    emitirToast("Acesso autorizado. Redirecionando...", "success");
+                    setTimeout(() => toggleModal('modalLogin'), 1500);
+                     window.location.href = '/painel-admin'; // Descomente para redirecionar
+                })
+                .catch((error) => {
+                    emitirToast("Credenciais inválidas.", "error");
+                });
+        }
+    </script>
+</body>
+</html>

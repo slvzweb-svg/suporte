@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Nobre RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === PALETA DE CORES === */
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #121212;
+            --bg-surface-alt: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #9e9e9e;
+            --text-muted: #666666;
+            
+            --accent-red: #d32f2f;
+            --accent-red-hover: #b71c1c;
+            --accent-gold: #c5a059;
+            --accent-green: #2e7d32;
+            --accent-blue: #1976d2;
+            
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.8);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: none; /* Escondido até validar o login */
+        }
+
+        /* === ANIMAÇÕES (NOVAS) === */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes toastSlide { 0% { transform: translateX(120%); opacity: 0; } 10% { transform: translateX(0); opacity: 1; } 90% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(120%); opacity: 0; } }
+        @keyframes progressShrink { from { width: 100%; } to { width: 0%; } }
+
+        /* === LOADER E PROTEÇÃO === */
+        #authLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-base); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 99999; color: var(--accent-gold);
+            text-align: center; padding: 20px;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 4px solid var(--border-color);
+            border-top-color: var(--accent-gold); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* === MOBILE FIRST: LAYOUT BASE === */
+        .admin-layout { display: flex; flex-direction: column; min-height: 100vh; animation: fadeIn 0.5s ease; }
+
+        .sidebar {
+            width: 100%; background: var(--bg-surface); border-bottom: 1px solid var(--border-color);
+            padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .brand { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 10px; color: var(--text-primary); }
+        .brand i { color: var(--accent-gold); font-size: 1.3rem; }
+
+        .nav-menu { display: none; } 
+
+        .btn-logout {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--accent-red); padding: 8px 12px; border-radius: 6px;
+            cursor: pointer; transition: var(--transition); display: flex;
+            justify-content: center; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;
+        }
+        .btn-logout:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+
+        .main-content { flex-grow: 1; padding: 20px; width: 100%; }
+
+        .page-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 24px; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+        .page-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;}
+        .page-header .btn-action { width: 100%; justify-content: center; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; transition: var(--transition); cursor: default; }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--text-muted); box-shadow: var(--shadow-md); }
+        .stat-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+        .stat-icon.total { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .stat-icon.pendente { background: rgba(197, 160, 89, 0.1); color: var(--accent-gold); }
+        .stat-icon.aprovado { background: rgba(46, 125, 50, 0.1); color: var(--accent-green); }
+        .stat-icon.reprovado { background: rgba(211, 47, 47, 0.1); color: var(--accent-red); }
+        .stat-info h3 { font-size: 1.5rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .stat-info span { color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+
+        .table-container { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; width: 100%; box-shadow: var(--shadow-md); }
+        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .table-header h2 { font-size: 1rem; font-weight: 600; }
+        
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
+        th { background: var(--bg-surface-alt); padding: 12px 16px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; vertical-align: middle; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Classe de animação da linha da tabela */
+        .tr-anim { opacity: 0; animation: slideInUp 0.4s ease forwards; }
+
+        .discord-tag { display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 0.95rem; color: #5865F2; }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; white-space: nowrap; }
+        .badge.pendente { background: rgba(197, 160, 89, 0.1); color: var(--accent-gold); border: 1px solid rgba(197, 160, 89, 0.3); }
+        .badge.aprovado { background: rgba(46, 125, 50, 0.1); color: var(--accent-green); border: 1px solid rgba(46, 125, 50, 0.3); }
+        .badge.reprovado { background: rgba(211, 47, 47, 0.1); color: var(--accent-red); border: 1px solid rgba(211, 47, 47, 0.3); }
+
+        .action-btns { display: flex; gap: 8px; }
+        .btn-action { background: var(--bg-surface-alt); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .btn-action:hover { background: var(--text-primary); color: var(--bg-base); }
+        .btn-action.danger:hover { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+
+        /* === MODAIS (GERAL) === */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: var(--transition);
+            padding: 10px;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--bg-surface); border: 1px solid var(--border-color);
+            width: 100%; border-radius: 8px; display: flex; flex-direction: column; 
+            box-shadow: var(--shadow-md); opacity: 0; transform: scale(0.95); transition: var(--transition);
+        }
+        .modal-overlay.active .modal-content { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.1rem; color: var(--accent-gold); }
+        .btn-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 5px; transition: var(--transition);}
+        .btn-close:hover { color: var(--accent-red); transform: rotate(90deg); }
+        
+        /* Modal Ficha Específico */
+        #modalFicha .modal-content { max-width: 900px; max-height: 95vh; }
+        #modalFicha .modal-body { padding: 20px; overflow-y: auto; }
+        
+        /* Modal Confirmação Específico (NOVO) */
+        #modalConfirmacao .modal-content { max-width: 400px; text-align: center; }
+        #modalConfirmacao .modal-body { padding: 30px 20px; }
+        #modalConfirmacao .modal-body i { font-size: 3rem; margin-bottom: 15px; }
+        #modalConfirmacao .modal-body h3 { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-primary); }
+        #modalConfirmacao .modal-body p { color: var(--text-secondary); font-size: 0.95rem; }
+        #modalConfirmacao .modal-footer { justify-content: center; gap: 15px; }
+
+        .modal-info-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .modal-info-header .status-box { text-align: left; }
+        .grid-2-col { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .resposta-secao { margin-bottom: 20px; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 6px; padding: 16px; transition: var(--transition); }
+        .resposta-secao:hover { border-color: rgba(197, 160, 89, 0.3); }
+        .resposta-secao h4 { color: var(--accent-gold); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; font-size: 0.95rem; text-transform: uppercase; }
+        .pergunta-bloco { margin-bottom: 16px; }
+        .pergunta-bloco:last-child { margin-bottom: 0; }
+        .pergunta-bloco strong { display: block; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
+        .pergunta-bloco p { color: var(--text-primary); font-size: 0.9rem; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px; border-left: 2px solid var(--border-color); word-wrap: break-word;}
+
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; background: var(--bg-surface-alt); border-radius: 0 0 8px 8px; flex-wrap: wrap; }
+        
+        .btn-decisao { padding: 10px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: var(--transition); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; flex-grow: 1; text-align: center; color: #fff; }
+        .btn-decisao.aprovar { background: var(--accent-green); }
+        .btn-decisao.aprovar:hover { background: #1b5e20; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4); }
+        .btn-decisao.reprovar { background: var(--accent-red); }
+        .btn-decisao.reprovar:hover { background: var(--accent-red-hover); box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4); }
+        .btn-decisao.neutro { background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-decisao.neutro:hover { background: var(--border-color); }
+
+        /* TOASTS MELHORADOS (NOVOS) */
+        .toast-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: calc(100% - 40px); max-width: 350px;}
+        .toast {
+            background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary);
+            padding: 16px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px;
+            font-size: 0.95rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto;
+            position: relative; overflow: hidden; opacity: 0; animation: toastSlide 4s ease forwards;
+        }
+        .toast i { font-size: 1.2rem; margin-top: 2px; }
+        .toast .toast-content { flex-grow: 1; }
+        .toast .toast-title { font-weight: 700; margin-bottom: 2px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        .toast .toast-msg { color: var(--text-secondary); font-size: 0.85rem; }
+        
+        .toast.success { border-left: 4px solid var(--accent-green); }
+        .toast.success i { color: var(--accent-green); }
+        .toast.error { border-left: 4px solid var(--accent-red); }
+        .toast.error i { color: var(--accent-red); }
+        .toast.info { border-left: 4px solid var(--accent-blue); }
+        .toast.info i { color: var(--accent-blue); }
+        
+        /* Barra de progresso do Toast */
+        .toast::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.2); animation: progressShrink 3.8s linear forwards; }
+        .toast.success::after { background: var(--accent-green); }
+        .toast.error::after { background: var(--accent-red); }
+        .toast.info::after { background: var(--accent-blue); }
+
+        /* Desktop Queries */
+        @media (min-width: 768px) {
+            .admin-layout { flex-direction: row; }
+            .sidebar { width: 260px; height: 100vh; flex-direction: column; justify-content: flex-start; padding: 24px; border-right: 1px solid var(--border-color); border-bottom: none; }
+            .brand { margin-bottom: 40px; font-size: 1.25rem; }
+            .nav-menu { display: block; list-style: none; flex-grow: 1; width: 100%; }
+            .nav-item { margin-bottom: 10px; }
+            .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-secondary); text-decoration: none; border-radius: 6px; transition: var(--transition); font-weight: 500; }
+            .nav-link:hover, .nav-link.active { background: rgba(197, 160, 89, 0.1); color: var(--accent-gold); }
+            .btn-logout { width: 100%; padding: 12px; font-size: 1rem; }
+            .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); } 
+            .page-header { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+            .page-header h1 { font-size: 1.8rem; }
+            .page-header .btn-action { width: auto; }
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;}
+            .stat-card { flex-direction: row; padding: 24px; gap: 20px; align-items: center; }
+            .stat-icon { width: 50px; height: 50px; font-size: 1.5rem; }
+            .modal-header { padding: 20px 24px; }
+            .modal-info-header { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+            .modal-info-header .status-box { text-align: right; }
+            .grid-2-col { grid-template-columns: 1fr 1fr; }
+            #modalFicha .btn-decisao { flex-grow: 0; font-size: 0.85rem; padding: 10px 20px; }
+            .toast-wrapper { right: 24px; left: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="authLoader">
+        <div class="spinner"></div>
+        <h2>Verificando Credenciais...</h2>
+    </div>
+
+    <div class="admin-layout" id="adminPanel" style="display: none;">
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-chess-knight"></i>
+                <span>Nobre RP</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active"><i class="fa-solid fa-users-viewfinder"></i> Recrutamento</a>
+                </li>
+            </ul>
+            <button class="btn-logout" onclick="abrirModalSair()">
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-mobile">Sair</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>Controle de Recrutamento</h1>
+                    <p>Gerencie as inscrições para a equipe de Suporte.</p>
+                </div>
+                <button class="btn-action" onclick="carregarDados()" style="padding: 10px 15px; font-weight: 600;">
+                    <i class="fa-solid fa-rotate-right"></i> Atualizar Dados
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon total"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info"><h3 id="countTotal">0</h3><span>Total Fichas</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pendente"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div class="stat-info"><h3 id="countPendente">0</h3><span>Aguardando</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon aprovado"><i class="fa-solid fa-check-double"></i></div>
+                    <div class="stat-info"><h3 id="countAprovado">0</h3><span>Aprovados</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon reprovado"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="stat-info"><h3 id="countReprovado">0</h3><span>Reprovados</span></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>Lista de Candidatos</h2>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Discord</th>
+                                <th>Idade/Local</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCorpo">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalFicha">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-signature"></i> Detalhes da Ficha</h3>
+                <button class="btn-close" onclick="fecharModal('modalFicha')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="conteudoFicha"></div>
+            <div class="modal-footer">
+                <input type="hidden" id="candidatoIdAtual">
+                <button class="btn-decisao reprovar" onclick="confirmarAcao('Reprovado')"><i class="fa-solid fa-thumbs-down"></i> Reprovar</button>
+                <button class="btn-decisao aprovar" onclick="confirmarAcao('Aprovado')"><i class="fa-solid fa-thumbs-up"></i> Aprovar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalConfirmacao">
+        <div class="modal-content">
+            <div class="modal-body">
+                <i id="confirmIcon" class="fa-solid fa-circle-exclamation" style="color: var(--accent-gold);"></i>
+                <h3 id="confirmTitle">Atenção</h3>
+                <p id="confirmMessage">Tem certeza que deseja realizar esta ação?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-decisao neutro" onclick="fecharModal('modalConfirmacao')">Cancelar</button>
+                <button class="btn-decisao aprovar" id="btnConfirmarAcao" onclick="executarAcaoConfirmada()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-wrapper" id="toastBox"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        // Importado deleteDoc para apagar
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwVQFewEN1mQDe0pnIEVU_H98l5JCeciI",
+            authDomain: "site-f55e1.firebaseapp.com",
+            projectId: "site-f55e1",
+            storageBucket: "site-f55e1.firebasestorage.app",
+            messagingSenderId: "800441189890",
+            appId: "1:800441189890:web:27f8911aa47964665f091b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let arrayCandidatos = [];
+        let acaoPendente = null; // Armazena qual função deve ser executada após o Popup de Confirmação
+
+        // === SISTEMA DE TOASTS MELHORADO ===
+        window.emitirToast = function(titulo, mensagem, tipo = 'success') {
+            const caixa = document.getElementById('toastBox');
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            
+            let icone = 'fa-check-circle';
+            if(tipo === 'error') icone = 'fa-circle-xmark';
+            if(tipo === 'info') icone = 'fa-circle-info';
+
+            toast.innerHTML = `
+                <i class="fa-solid ${icone}"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${titulo}</div>
+                    <div class="toast-msg">${mensagem}</div>
+                </div>
+            `;
+            
+            caixa.appendChild(toast);
+            
+            // Remove do DOM após a animação de 4s
+            setTimeout(() => { toast.remove(); }, 4000);
+        }
+
+        // === VERIFICAÇÃO DE LOGIN ===
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.body.style.display = 'block';
+                document.getElementById('authLoader').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'flex';
+                carregarDados();
+            } else {
+                window.location.href = 'index.html'; 
+            }
+        });
+
+        // === LÓGICA DE POPUPS (MODAIS) ===
+        window.fecharModal = function(idModal) {
+            document.getElementById(idModal).classList.remove('active');
+            if(idModal === 'modalConfirmacao') acaoPendente = null;
+        }
+
+        // Fechar clicando fora do modal
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if(e.target === this) fecharModal(this.id);
+            });
+        });
+
+        // Configura e abre o Modal de Confirmação Customizado
+        window.abrirPopupConfirmacao = function(titulo, mensagem, iconeClass, corIcone, btnTexto, btnCorClass, callbackAcao) {
+            document.getElementById('confirmTitle').innerText = titulo;
+            document.getElementById('confirmMessage').innerText = mensagem;
+            
+            const iconEl = document.getElementById('confirmIcon');
+            iconEl.className = `fa-solid ${iconeClass}`;
+            iconEl.style.color = corIcone;
+
+            const btnConfirma = document.getElementById('btnConfirmarAcao');
+            btnConfirma.innerText = btnTexto;
+            btnConfirma.className = `btn-decisao ${btnCorClass}`; // ex: aprovar, reprovar
+
+            acaoPendente = callbackAcao;
+            document.getElementById('modalConfirmacao').classList.add('active');
+        }
+
+        // Executa a ação salva quando o botão "Confirmar" é clicado no Popup
+        window.executarAcaoConfirmada = function() {
+            if(acaoPendente && typeof acaoPendente === 'function') {
+                acaoPendente();
+            }
+            fecharModal('modalConfirmacao');
+        }
+
+        // === FUNÇÕES DE AÇÃO ===
+
+        window.abrirModalSair = function() {
+            abrirPopupConfirmacao(
+                "Sair do Painel", "Tem certeza que deseja desconectar sua conta administrativa?", 
+                "fa-right-from-bracket", "var(--accent-red)", 
+                "Desconectar", "reprovar", 
+                () => {
+                    signOut(auth).then(() => {
+                        window.location.href = 'index.html';
+                    });
+                }
+            );
+        }
+
+        window.carregarDados = async function() {
+            const tbody = document.getElementById('tabelaCorpo');
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 10px;"></i><br>Atualizando registros...</td></tr>`;
+            
+            try {
+                const q = query(collection(db, "candidatos_suporte"), orderBy("data_inscricao", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                arrayCandidatos = [];
+                let html = '';
+                let stats = { total: 0, pendente: 0, aprovado: 0, reprovado: 0 };
+                let delayIndex = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    arrayCandidatos.push({ id, ...data });
+
+                    stats.total++;
+                    if(data.status === 'Aguardando Análise') stats.pendente++;
+                    else if(data.status === 'Aprovado') stats.aprovado++;
+                    else if(data.status === 'Reprovado') stats.reprovado++;
+
+                    let classeBadge = 'pendente';
+                    let textoStatus = 'Pendente';
+                    if(data.status === 'Aprovado') { classeBadge = 'aprovado'; textoStatus = 'Aprovado'; }
+                    if(data.status === 'Reprovado') { classeBadge = 'reprovado'; textoStatus = 'Reprovado'; }
+
+                    let dataFormatada = 'N/A';
+                    if(data.data_inscricao) {
+                        const dateObj = data.data_inscricao.toDate();
+                        dataFormatada = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    }
+
+                    // Animação em cascata (delay progressivo para as linhas)
+                    const animDelay = delayIndex * 0.05;
+                    delayIndex++;
+
+                    html += `
+                        <tr class="tr-anim" style="animation-delay: ${animDelay}s;">
+                            <td><strong>${data.basico?.nome || 'N/A'}</strong></td>
+                            <td><div class="discord-tag"><i class="fa-brands fa-discord"></i> ${data.basico?.discord || 'N/A'}</div></td>
+                            <td>${data.basico?.idade || '--'} anos <br><small style="color:var(--text-muted)">${data.basico?.cidade || '--'}</small></td>
+                            <td><span class="badge ${classeBadge}">${textoStatus}</span></td>
+                            <td style="color:var(--text-muted); font-size:0.85rem;">${dataFormatada}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-action" onclick="abrirFicha('${id}')" title="Ler Ficha">
+                                        <i class="fa-solid fa-eye"></i> Ler
+                                    </button>
+                                    <button class="btn-action danger" onclick="confirmarExclusao('${id}')" title="Excluir Ficha">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if(arrayCandidatos.length === 0) {
+                    html = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:40px;">Nenhuma inscrição encontrada no momento.</td></tr>`;
+                }
+
+                tbody.innerHTML = html;
+
+                document.getElementById('countTotal').innerText = stats.total;
+                document.getElementById('countPendente').innerText = stats.pendente;
+                document.getElementById('countAprovado').innerText = stats.aprovado;
+                document.getElementById('countReprovado').innerText = stats.reprovado;
+
+                // Toast informativo silencioso (opcional, comente se achar muito barulhento toda vez)
+                if(stats.total > 0) emitirToast("Dados Sincronizados", `Foram carregadas ${stats.total} fichas.`, "info");
+
+            } catch (error) {
+                console.error("Erro:", error);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red); padding:40px;">Erro ao buscar dados.</td></tr>`;
+                emitirToast("Erro no Servidor", "Não foi possível carregar os dados.", "error");
+            }
+        }
+
+        window.abrirFicha = function(id) {
+            const candidato = arrayCandidatos.find(c => c.id === id);
+            if(!candidato) return;
+            document.getElementById('candidatoIdAtual').value = id;
+
+            // HTML da Ficha mantido do anterior
+            const htmlModal = `
+                <div class="modal-info-header">
+                    <div>
+                        <h2 style="color:var(--text-primary); font-size:1.5rem;">${candidato.basico?.nome || 'N/A'}</h2>
+                        <span style="color:var(--text-secondary);"><i class="fa-brands fa-discord" style="color:#5865F2;"></i> ${candidato.basico?.discord || 'N/A'}</span>
+                    </div>
+                    <div class="status-box">
+                        <span style="display:block; font-size:0.85rem; color:var(--text-muted);">Status Atual:</span>
+                        <span style="font-weight:bold; text-transform:uppercase; color: ${candidato.status === 'Aprovado' ? 'var(--accent-green)' : candidato.status === 'Reprovado' ? 'var(--accent-red)' : 'var(--accent-gold)'}">${candidato.status}</span>
+                    </div>
+                </div>
+
+                <div class="resposta-secao">
+                    <h4><i class="fa-solid fa-id-card"></i> Dados Básicos & Acesso</h4>
+                    <div class="grid-2-col">
+                        <div class="pergunta-bloco"><strong>Idade:</strong> <p>${candidato.basico?.idade || 'N/A'} anos</p></div>
+                        <div class="pergunta-bloco"><strong>Local:</strong> <p>${candidato.basico?.cidade || 'N/A'}</p></div>
+                        <div class="pergunta-bloco"><strong>Dispositivos:</strong> <p>${candidato.tecnico?.dispositivos || 'N/A'}</p></div>
+                        <div class="pergunta-bloco"><strong>Estabilidade Net:</strong> <p>${candidato.tecnico?.estabilidade || 'N/A'}</p></div>
+                    </div>
+                </div>
+
+                <div class="resposta-secao">
+                    <h4><i class="fa-solid fa-clock"></i> Disponibilidade</h4>
+                    <div class="pergunta-bloco"><strong>Horários Selecionados:</strong> <p>${(candidato.disponibilidade?.horarios || []).join(', ') || 'Nenhum'}</p></div>
+                    <div class="grid-2-col" style="margin-top:15px;">
+                        <div class="pergunta-bloco"><strong>Horas p/ dia:</strong> <p>${candidato.disponibilidade?.horas_diarias || 'N/A'}h</p></div>
+                        <div class="pergunta-bloco"><strong>Constância:</strong> <p>${candidato.disponibilidade?.constancia || 'N/A'}</p></div>
+                    </div>
+                </div>
+
+                <div class="resposta-secao">
+                    <h4><i class="fa-solid fa-headset"></i> Perfil & Situações</h4>
+                    <div class="pergunta-bloco"><strong>É paciente? Por quê?</strong> <p>${candidato.perfil?.paciente || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Reação a xingamentos:</strong> <p>${candidato.perfil?.reacao || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Tenta resolver ou pede ajuda?</strong> <p>${candidato.perfil?.metodo_resolucao || 'N/A'}</p></div>
+                    
+                    <div class="pergunta-bloco" style="margin-top:20px;"><strong>Player nervoso xingando Staff:</strong> <p>${candidato.pratica?.player_nervoso || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Não sabe resolver o problema:</strong> <p>${candidato.pratica?.sem_solucao || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Dois players discutindo no ticket:</strong> <p>${candidato.pratica?.discussao_ticket || 'N/A'}</p></div>
+                </div>
+
+                <div class="resposta-secao">
+                    <h4><i class="fa-solid fa-brain"></i> Experiência & Intenção</h4>
+                    <div class="grid-2-col" style="margin-bottom:15px;">
+                        <div class="pergunta-bloco"><strong>Nível de RP:</strong> <p>${candidato.tecnico?.regras_rp || 'N/A'}</p></div>
+                        <div class="pergunta-bloco"><strong>Nível Discord:</strong> <p>${candidato.tecnico?.nivel_discord || 'N/A'}</p></div>
+                    </div>
+                    <div class="pergunta-bloco"><strong>Experiência Anterior:</strong> <p>${candidato.tecnico?.experiencia_previa || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Por que quer entrar?</strong> <p>${candidato.psicologico?.motivacao || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>O que um bom suporte precisa?</strong> <p>${candidato.psicologico?.qualidades_necessarias || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Lidar com críticas/correções:</strong> <p>${candidato.psicologico?.lida_criticas || 'N/A'}</p></div>
+                    <div class="pergunta-bloco"><strong>Aceita hierarquia?</strong> <p>${candidato.psicologico?.aceita_hierarquia || 'N/A'}</p></div>
+                </div>
+            `;
+
+            document.getElementById('conteudoFicha').innerHTML = htmlModal;
+            document.getElementById('modalFicha').classList.add('active');
+        }
+
+        // Dispara Popup de Confirmação para Aprovar/Reprovar
+        window.confirmarAcao = function(novoStatus) {
+            const id = document.getElementById('candidatoIdAtual').value;
+            if(!id) return;
+
+            const config = novoStatus === 'Aprovado' 
+                ? { titulo: "Aprovar Candidato", icone: "fa-thumbs-up", cor: "var(--accent-green)", btnTxt: "Aprovar", btnCor: "aprovar" }
+                : { titulo: "Reprovar Candidato", icone: "fa-thumbs-down", cor: "var(--accent-red)", btnTxt: "Reprovar", btnCor: "reprovar" };
+
+            abrirPopupConfirmacao(
+                config.titulo, 
+                `Você está prestes a marcar este candidato como ${novoStatus.toUpperCase()}. Confirmar?`, 
+                config.icone, config.cor, config.btnTxt, config.btnCor,
+                async () => {
+                    try {
+                        await updateDoc(doc(db, "candidatos_suporte", id), { status: novoStatus });
+                        emitirToast("Status Atualizado", `O candidato foi marcado como ${novoStatus}.`, "success");
+                        fecharModal('modalFicha');
+                        carregarDados(); 
+                    } catch (error) {
+                        console.error(error);
+                        emitirToast("Erro na Ação", "Não foi possível atualizar o status.", "error");
+                    }
+                }
+            );
+        }
+
+        // Dispara Popup de Confirmação para EXCLUIR uma ficha permanentemente
+        window.confirmarExclusao = function(id) {
+            abrirPopupConfirmacao(
+                "Excluir Ficha", 
+                "Esta ação é irreversível. A ficha do candidato será apagada permanentemente do banco de dados. Deseja continuar?", 
+                "fa-trash", "var(--accent-red)", 
+                "Apagar Ficha", "reprovar",
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "candidatos_suporte", id));
+                        emitirToast("Ficha Excluída", "O registro foi apagado com sucesso do banco de dados.", "success");
+                        carregarDados(); // Recarrega a tabela para remover a linha apagada
+                    } catch (error) {
+                        console.error(error);
+                        emitirToast("Erro de Exclusão", "Não foi possível apagar a ficha. Verifique as permissões.", "error");
+                    }
+                }
+            );
+        }
+    </script>
+</body>
+</html>
